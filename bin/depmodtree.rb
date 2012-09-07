@@ -1,4 +1,4 @@
-#!/bin/env ruby
+#!/usr/bin/env ruby
 #
 # Copyright (C) 2012-  Changli Gao <xiaosuo@gmail.com>
 #
