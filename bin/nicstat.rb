@@ -133,12 +133,12 @@ while true
         n = s[xx][t]
         if last_nic_stat.include?(i) and last_nic_stat[i][xx][t] <= n
           r = n - last_nic_stat[i][xx][t]
-	else
-	  r = n
-	end
-	r /= options[:delay].to_f
-	r *= 8 if t == "bytes"
-	pretty_print(r)
+        else
+          r = n
+        end
+        r /= options[:delay].to_f
+        r *= 8 if t == "bytes"
+        pretty_print(r)
       end
     end
     puts

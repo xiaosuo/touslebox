@@ -72,10 +72,10 @@ def print_ascent(parent, m, prefix)
       i = i.next
       if (i == parent[m].length)
         print "`-";
-	next_prefix = prefix + "  ";
+        next_prefix = prefix + "  ";
       else
         print "+-";
-	next_prefix = prefix + "| ";
+        next_prefix = prefix + "| ";
       end
       puts "#{p}"
       print_ascent(parent, p, next_prefix)
