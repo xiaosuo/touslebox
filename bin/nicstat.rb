@@ -125,7 +125,8 @@ puts "+----------------+-------+-------+-------+-------+-------+-------+"
 while true
   sleep(options[:delay])
   nic_stat = get_nic_stat
-  nic_stat.each do |i, s|
+  nic_stat.keys.sort.each do |i|
+    s = nic_stat[i]
     next if options[:nic] and options[:nic] != s["name"]
     printf("|%16s|", s["name"])
     ["rx", "tx"].each do |xx|
@@ -148,4 +149,5 @@ while true
     break if options[:count] == 0
   end
   last_nic_stat = nic_stat
+  puts "+----------------+-------+-------+-------+-------+-------+-------+"
 end
