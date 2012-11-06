@@ -96,7 +96,11 @@ STEP=4
 echo "done"
 
 echo -n "Installing the base system..."
-debootstrap --arch $ARCH $SUITE $TARGET $MIRROR
+if [ -n "$VARIANT" ]; then
+	debootstrap --variant=$VARIANT --arch $ARCH $SUITE $TARGET $MIRROR
+else
+	debootstrap --arch $ARCH $SUITE $TARGET $MIRROR
+fi
 echo "done"
 
 echo -n "Configuring the base system..."
@@ -135,7 +139,7 @@ echo "done"
 
 chroot_do()
 {
-	sudo chroot $TARGET /bin/bash -c "$1"
+	chroot $TARGET /bin/bash -c "$1"
 }
 
 echo -n "Installing the kernel..."
@@ -170,7 +174,7 @@ EOF
 echo "done"
 
 echo -n "Cleaning up..."
-chroot $TARGET /bin/bash -c 'aptitude clean'
+chroot_do 'apt-get clean'
 # TODO: remove doc, man, locales and ....
 echo "done"
 
