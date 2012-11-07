@@ -42,8 +42,9 @@ elif [ $# -gt 1 ]; then
 	echo "Usage: $0 [CONFIG_FILE]"
 	exit 1
 fi
+DIST=${DIST:-debian}
 SUITE=${SUITE:-stable}
-IMAGE=${IMAGE:-debian-$SUITE.raw}
+IMAGE=${IMAGE:-${DIST}-$SUITE.raw}
 test -e $IMAGE || dd if=/dev/zero of=$IMAGE bs=512 count=$((500*1024*1024/512))
 IMAGE_SIZE=$(stat -c %s $IMAGE)
 if [ $IMAGE_SIZE -lt $((500*1024*1024)) ]; then
@@ -51,8 +52,8 @@ if [ $IMAGE_SIZE -lt $((500*1024*1024)) ]; then
 	exit 1
 fi
 ARCH=${ARCH:-i386}
-MIRROR=${MIRROR:-http://mirrors.163.com/debian}
-HOSTNAME=${HOSTNAME:-debian}
+MIRROR=${MIRROR:-http://mirrors.163.com/$DIST}
+HOSTNAME=${HOSTNAME:-$DIST}
 TIMEZONE=${TIMEZONE:-Etc/UTC}
 NAMESERVER=${NAMESERVER:-8.8.8.8}
 
@@ -143,17 +144,44 @@ chroot_do()
 }
 
 echo -n "Installing the kernel..."
-case $ARCH in
-i386)
-	KERNEL_ARCH=686
+case $DIST in
+debian)
+	case $ARCH in
+	i386)
+		KERNEL_ARCH=686
+		;;
+	amd64)
+		KERNEL_ARCH=amd64
+		;;
+	*)
+		echo "Unsupported architecture: $ARCH"
+		;;
+	esac
+	LINUX=linux-image-$KERNEL_ARCH
 	;;
-amd64)
-	KERNEL_ARCH=amd64
+ubuntu)
+	LINUX=linux-image
+	# preconfigure grub-pc pulled in by linux-image
+	cat >>$TARGET/var/cache/debconf/config.dat <<-EOF
+	Name: grub-pc/install_devices
+	Template: grub-pc/install_devices
+	Value: 
+	Owners: grub-pc
+	Flags: seen
+
+	Name: grub-pc/install_devices_empty
+	Template: grub-pc/install_devices_empty
+	Value: true
+	Owners: grub-pc
+	Flags: seen
+
+	EOF
 	;;
 *)
-	echo "Unsupported architecture: $ARCH"
+	echo "Unsupported distribution: $DIST"
+	;;
 esac
-chroot_do "apt-get -y --force-yes install linux-image-$KERNEL_ARCH"
+chroot_do "apt-get -y --force-yes install $LINUX"
 echo "done"
 
 echo -n "Installing the boot loader..."
@@ -166,7 +194,7 @@ insmod ext2
 
 search --fs-uuid --set $UUID
 
-menuentry "debian" {
+menuentry "$DIST" {
 	linux /vmlinuz root=UUID=$UUID
 	initrd /initrd.img
 }
@@ -180,7 +208,7 @@ echo "done"
 
 cat <<EOF
 $IMAGE is ready, and you can test it with qemu now:
-    qemu-system-i386 -hda debian-stable.raw -curses
+    qemu-system-i386 -hda $IMAGE -curses
 You can also convert it to a VMDK disk image with qemu-img:
-    qemu-img convert -O vmdk debian-stable.raw debian-stable.vmdk
+    qemu-img convert -f raw -O vmdk $IMAGE ${IMAGE%.*}.vmdk
 EOF
