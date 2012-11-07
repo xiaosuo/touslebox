@@ -44,7 +44,7 @@ elif [ $# -gt 1 ]; then
 fi
 DIST=${DIST:-debian}
 SUITE=${SUITE:-stable}
-IMAGE=${IMAGE:-${DIST}-$SUITE.raw}
+IMAGE=${IMAGE:-$DIST-$SUITE.raw}
 test -e $IMAGE || dd if=/dev/zero of=$IMAGE bs=512 count=$((500*1024*1024/512))
 IMAGE_SIZE=$(stat -c %s $IMAGE)
 if [ $IMAGE_SIZE -lt $((500*1024*1024)) ]; then
@@ -130,9 +130,6 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
-EOF
-cat >> $TARGET/etc/apt/sources.list <<EOF
-deb http://security.debian.org/ squeeze/updates main
 EOF
 # erase the password of root
 sed -i '/root/s/\*//g' $TARGET/etc/shadow
