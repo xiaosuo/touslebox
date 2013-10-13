@@ -399,7 +399,7 @@ EOF
 
 cd ..
 autoscan
-sed -i -e "s/FULL-PACKAGE-NAME/$PROJECT_NAME/g" \
+sed -i~ -e "s/FULL-PACKAGE-NAME/$PROJECT_NAME/g" \
 	    -e 's/VERSION/1.0.0/g' \
 	    -e 's/BUG-REPORT-ADDRESS/xiaosuo@gmail.com/g' configure.scan
 awk '
@@ -409,7 +409,7 @@ awk '
 	next;
 }
 
-/^AC_CONFIG_HEADERS.*/ {
+/^AC_CONFIG_HEADER.*/ {
 	print;
 	print "";
 	print "AC_USE_SYSTEM_EXTENSIONS";
@@ -459,6 +459,7 @@ config.log
 config.status
 configure
 configure.scan
+configure.scan~
 depcomp
 install-sh
 Makefile

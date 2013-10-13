@@ -452,7 +452,7 @@ EOF
 
 cd ..
 autoscan
-sed -i -e "s/FULL-PACKAGE-NAME/$FULL_LIBRARY_NAME/g" \
+sed -i~ -e "s/FULL-PACKAGE-NAME/$FULL_LIBRARY_NAME/g" \
 	    -e 's/VERSION/1.0.0/g' \
 	    -e 's/BUG-REPORT-ADDRESS/xiaosuo@gmail.com/g' configure.scan
 awk "
@@ -463,7 +463,7 @@ awk "
 	next;
 }
 
-/^AC_CONFIG_HEADERS.*/ {
+/^AC_CONFIG_HEADER.*/ {
 	print;
 	print \"\";
 	print \"AC_USE_SYSTEM_EXTENSIONS\";
@@ -475,7 +475,6 @@ awk "
 	print;
 	print \"AC_PROG_CC_C99\";
 	print \"AC_PROG_CC_C_O\";
-	print \"AM_PROG_AR\";
 	print \"\";
 	print \"LT_INIT\";
 	next;
@@ -529,6 +528,7 @@ config.status
 config.sub
 configure
 configure.scan
+configure.scan~
 depcomp
 install-sh
 libtool
