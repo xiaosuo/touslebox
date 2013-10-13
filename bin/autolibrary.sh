@@ -475,6 +475,7 @@ awk "
 	print;
 	print \"AC_PROG_CC_C99\";
 	print \"AC_PROG_CC_C_O\";
+	print \"m4_ifdef([AM_PROG_AR], [AM_PROG_AR])\";
 	print \"\";
 	print \"LT_INIT\";
 	next;
