@@ -392,6 +392,7 @@ int main(int argc, char *argv[])
 }
 EOF
 cat > Makefile.am <<EOF
+AM_CFLAGS = -Wall -Werror
 bin_PROGRAMS = $PROJECT_NAME
 ${PROJECT_NAME/-/_}_SOURCES = main.c
 EOF
@@ -468,13 +469,11 @@ src/.deps/
 src/$PROJECT_NAME
 stamp-h1
 EOF
-
 git init
 git add .gitignore configure.ac Makefile.am README.md LICENSE.txt src/main.c \
 	    src/Makefile.am
 
 autoreconf -fi
 ./configure --prefix=/usr --sysconfdir=/etc
-make
 make distcheck
 git status
