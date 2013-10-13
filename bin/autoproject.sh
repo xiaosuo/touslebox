@@ -406,7 +406,7 @@ awk '
 /^AC_CONFIG_SRCDIR.*/ {
 	print;
 	print "AM_INIT_AUTOMAKE([foreign -Wall -Werror])";
-	getline;
+	next;
 }
 
 /^AC_CONFIG_HEADERS.*/ {
@@ -414,14 +414,14 @@ awk '
 	print "";
 	print "AC_USE_SYSTEM_EXTENSIONS";
 	print "AC_SYS_LARGEFILE";
-	getline;
+	next;
 }
 
 /^AC_PROG_CC/ {
 	print;
 	print "AC_PROG_CC_C99";
 	print "AC_PROG_CC_C_O";
-	getline;
+	next;
 }
 
 /^.*$/ {
