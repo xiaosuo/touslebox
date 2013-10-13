@@ -532,7 +532,7 @@ configure.scan~
 depcomp
 install-sh
 libtool
-libz.pc
+${FULL_LIBRARY_NAME}.pc
 ltmain.sh
 m4/libtool.m4
 m4/lt~obsolete.m4
