@@ -2,17 +2,20 @@
 
 set -e
 
-if [ $# -ne 1 ]; then
-	echo "Usage: $0 library-name"
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 library-name library-descrption"
 	exit 1
 fi
 LIBRARY_NAME=$1
+LIBRARY_DESCRPTION=$2
 FULL_LIBRARY_NAME=lib$LIBRARY_NAME
 
 mkdir $FULL_LIBRARY_NAME
 cd $FULL_LIBRARY_NAME
 cat > README.md <<EOF
 # $FULL_LIBRARY_NAME
+
+$LIBRARY_DESCRPTION
 EOF
 cat > LICENSE.txt <<EOF
                     GNU GENERAL PUBLIC LICENSE
@@ -378,7 +381,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: ${FULL_LIBRARY_NAME}
-Description: ${FULL_LIBRARY_NAME}
+Description: ${LIBRARY_DESCRPTION}
 Version: @VERSION@
 Libs: -L\${libdir} -l${LIBRARY_NAME}
 Cflags: -I\${includedir}
@@ -388,7 +391,7 @@ mkdir src
 cd src
 cat > ${LIBRARY_NAME}.c <<EOF
 /**
- * $FULL_LIBRARY_NAME - $FULL_LIBRARY_NAME
+ * $FULL_LIBRARY_NAME - $LIBRARY_DESCRPTION
  * Copyright (C) $(date +%Y) Changli Gao <xiaosuo@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -406,6 +409,7 @@ cat > ${LIBRARY_NAME}.c <<EOF
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <config.h>
 #include <${LIBRARY_NAME}.h>
 EOF
 cat > Makefile.am <<EOF
@@ -420,7 +424,7 @@ mkdir include
 cd include
 cat > ${LIBRARY_NAME}.h <<EOF
 /**
- * $FULL_LIBRARY_NAME - $FULL_LIBRARY_NAME
+ * $FULL_LIBRARY_NAME - $LIBRARY_DESCRPTION
  * Copyright (C) $(date +%Y) Changli Gao <xiaosuo@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify

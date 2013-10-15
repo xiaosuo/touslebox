@@ -2,16 +2,19 @@
 
 set -e
 
-if [ $# -lt 1 ]; then
-	echo "Usage: $0 project-name"
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 project-name project-description"
 	exit 1
 fi
 PROJECT_NAME=$1
+PROJECT_DESCRIPTION=$2
 
 mkdir $PROJECT_NAME
 cd $PROJECT_NAME
 cat > README.md <<EOF
 # $PROJECT_NAME
+
+$PROJECT_DESCRIPTION
 EOF
 cat > LICENSE.txt <<EOF
                     GNU GENERAL PUBLIC LICENSE
@@ -365,7 +368,7 @@ mkdir src
 cd src
 cat > main.c <<EOF
 /**
- * $PROJECT_NAME - $PROJECT_NAME
+ * $PROJECT_NAME - $PROJECT_DESCRIPTION
  * Copyright (C) $(date +%Y) Changli Gao <xiaosuo@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -383,6 +386,7 @@ cat > main.c <<EOF
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <config.h>
 #include <stdlib.h>
 #include <stdio.h>
 
