@@ -442,6 +442,9 @@ cat > ${LIBRARY_NAME}.h <<EOF
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#ifndef __${LIBRARY_NAME^^*}_H
+#define __${LIBRARY_NAME^^*}_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -449,6 +452,8 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
+
+#endif /* __${LIBRARY_NAME^^*}_H */
 EOF
 cat > Makefile.am <<EOF
 nobase_include_HEADERS = ${LIBRARY_NAME}.h
