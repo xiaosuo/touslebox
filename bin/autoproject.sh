@@ -465,12 +465,12 @@ configure
 configure.scan
 configure.scan~
 depcomp
+.deps
 install-sh
 Makefile
 Makefile.in
 missing
 *.o
-src/.deps/
 src/$PROJECT_NAME
 stamp-h1
 EOF

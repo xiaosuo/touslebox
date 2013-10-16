@@ -540,9 +540,13 @@ configure
 configure.scan
 configure.scan~
 depcomp
+.deps
 install-sh
+*.la
+.libs
 libtool
 ${FULL_LIBRARY_NAME}.pc
+*.lo
 ltmain.sh
 m4/libtool.m4
 m4/lt~obsolete.m4
@@ -552,7 +556,7 @@ m4/ltversion.m4
 Makefile
 Makefile.in
 missing
-src/.deps/
+*.o
 stamp-h1
 EOF
 git add .gitignore LICENSE.txt Makefile.am README.md configure.ac \
