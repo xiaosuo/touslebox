@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+#
+# Copyright (C) 2014 Changli Gao <xiaosuo@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+require 'fileutils'
+
+if ARGV.size() != 2
+  puts "Usage: #{$0} executable directory"
+  exit(1)
+end
+executable = ARGV[0]
+unless File.executable?(executable)
+  puts "#{executable} is NOT executable"
+  exit(1)
+end
+directory = ARGV[1]
+unless Dir.exists?(directory)
+  puts "#{directory} is NOT a directory"
+  exit(1)
+end
+
+IO.popen("ldd #{executable}") do |io|
+  io.each_line do |line|
+    filename, path = line.split(/=>/)
+    filename.strip!
+    unless path
+      # dynamic loader
+      next unless filename.start_with?('/')
+      path = filename.split(/[ \t]+/)[0].strip
+      filename = File.basename(path)
+    else
+      path = path.strip.split(/[ \t]+/)[0].strip
+    end
+    next unless path.start_with?('/')
+    FileUtils.copy(path, directory) unless File.exists?(File.join(directory, filename))
+  end
+end
