@@ -28,7 +28,7 @@ unless File.executable?(executable)
   exit(1)
 end
 directory = ARGV[1]
-unless Dir.exists?(directory)
+unless File.exists?(directory) and File.directory?(directory)
   puts "#{directory} is NOT a directory"
   exit(1)
 end
