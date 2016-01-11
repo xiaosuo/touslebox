@@ -36,6 +36,9 @@ def get_remote_apps(remote_ip, local_ip, local_port)
       users[7...-1].scan(/\("[^"]*",(\d+),(\d+)\)/) do |m|
         pids << m[0].to_i
       end
+      users[7...-1].scan(/\("[^"]*",pid=(\d+),fd=(\d+)\)/) do |m|
+        pids << m[0].to_i
+      end
     end
     apps = []
     pids.uniq.each do |pid|
@@ -58,11 +61,6 @@ if ARGV.size < 2
 end
 host, port, limit = ARGV
 limit &&= limit.to_i
-
-def parse_ip_port(ip_port)
-  ip
-  return ip, port.to_i
-end
 
 apps = []
 Net::SSH.start(host, ENV['USER'],
