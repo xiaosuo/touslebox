@@ -5,18 +5,24 @@ import sys
 from stat import *
 
 def disk_usage(filename, dev):
-    size = 0
+    total_size = 0
     st = os.lstat(filename)
-    if st.st_mode & S_IFREG:
-        size += st.st_blksize * st.st_blocks
-    elif st.st_mode & S_IFDIR:
-        size += st.st_blksize * st.st_blocks
-        try:
-            for f in os.listdir(filename):
-                size += disk_usage(os.path.join(filename, f), dev)
-        except Exception as ex:
-            sys.stderr.write(str(ex) + "\n")
-    return size
+    if st.st_dev == dev:
+        if S_ISREG(st.st_mode):
+            total_size += st.st_blksize * st.st_blocks
+        elif S_ISDIR(st.st_mode):
+            total_size += st.st_blksize * st.st_blocks
+            try:
+                for f in os.listdir(filename):
+                    _, size = disk_usage(os.path.join(filename, f), dev)
+                    total_size += size
+            except Exception as ex:
+                sys.stderr.write(str(ex) + "\n")
+        else:
+            filename = None
+    else:
+        filename = None
+    return filename, total_size
 
 def pretty_size(size):
     units = 'BKMGT'
@@ -36,14 +42,15 @@ def main():
         path = sys.argv[1]
 
     st = os.lstat(path)
-    if st.st_mode & S_IFREG:
-        print "{} {}".format(st.st_blksize * st.st_blocks, path)
-    else:
+    if S_ISREG(st.st_mode):
+        print "{} {}".format(pretty_size(st.st_blksize * st.st_blocks), path)
+    elif S_ISDIR(st.st_mode):
         files = []
         try:
             for f in os.listdir(path):
-                f = os.path.join(path, f)
-                files.append((f, disk_usage(f, st.st_dev)))
+                f, size = disk_usage(os.path.join(path, f), st.st_dev)
+                if f:
+                    files.append((f, size))
         except Exception as ex:
             sys.stderr.write(str(ex) + "\n")
         for f, s in sorted(files, key=lambda f:f[1], reverse=True):
