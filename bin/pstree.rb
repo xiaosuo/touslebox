@@ -16,7 +16,13 @@ q << root
 until q.empty?
   ppid = q.shift
   begin
-    pids = IO.read("/proc/#{ppid}/task/#{ppid}/children").strip.split.map(&:to_i)
+    pids = []
+    Dir.foreach("/proc/#{ppid}/task") do |tid|
+      begin
+        pids += IO.read("/proc/#{ppid}/task/#{tid}/children").strip.split.map(&:to_i)
+      rescue
+      end
+    end
     q += pids
     pids.each do |pid|
       flat[ppid][pid] = {}
