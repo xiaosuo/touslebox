@@ -3,15 +3,14 @@
 import sys
 import os
 import socket
+import argparse
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 
-path = '.'
-if len(sys.argv) > 2:
-    print "Usage: {} [PATH]".format(sys.argv[0])
-    sys.exit(1)
-elif len(sys.argv) > 1:
-    path = sys.argv[1]
+ap = argparse.ArgumentParser(description='Share path via HTTP')
+ap.add_argument('path', default='.', help='The path to share', nargs='?')
+args = ap.parse_args()
+path = args.path
 
 if os.path.isfile(path):
     dirname = os.path.dirname(path)
