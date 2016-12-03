@@ -30,11 +30,15 @@ done
 shift $((OPTIND-1))
 DEV_LANG=`echo $DEV_LANG | tr '[:upper:]' '[:lower:]'`
 SRC_EXT='c'
+CC_POSTFIX=''
+COMPILER='CC'
 case $DEV_LANG in
 	c)
 		;;
 	c++)
 		SRC_EXT='cc'
+		CC_POSTFIX='XX'
+		COMPILER='CXX'
 		;;
 	*)
 		echo 'Only c and c++ are supported'
@@ -434,7 +438,7 @@ int main(int argc, char *argv[])
 }
 EOF
 cat > Makefile.am <<EOF
-AM_CFLAGS = -Wall -Werror
+AM_C${CC_POSTFIX}FLAGS = -Wall -Werror
 bin_PROGRAMS = $PROJECT_NAME
 ${PROJECT_NAME/-/_}_SOURCES = main.${SRC_EXT}
 EOF
@@ -488,8 +492,8 @@ AC_MSG_RESULT([
 	datarootdir:			\${datarootdir}
 	docdir:				\${docdir}
 
-	CC:				\${CC}
-	CFLAGS:				\${CFLAGS}
+	${COMPILER}:				\${${COMPILER}}
+	C${CC_POSTFIX}FLAGS:				\${C${CC_POSTFIX}FLAGS}
 	CPPFLAGS:			\${CPPFLAGS}
 	LDFLAGS:			\${LDFLAGS}
 ])
