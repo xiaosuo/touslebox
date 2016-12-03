@@ -2,8 +2,48 @@
 
 set -e
 
+DEV_LANG=c
+
+show_help() {
+	echo "Usage: $0 [Option]... project-name project-description"
+	echo
+	echo 'Options:'
+	echo '  -h            Show this message'
+	echo '  -l <language> Development language, C by default'
+}
+
+while getopts 'hl:' opt; do
+	case $opt in
+		l)
+			DEV_LANG=$OPTARG
+			;;
+		h)
+			show_help
+			exit
+			;;
+		*)
+			show_help
+			exit 1
+			;;
+	esac
+done
+shift $((OPTIND-1))
+DEV_LANG=`echo $DEV_LANG | tr '[:upper:]' '[:lower:]'`
+SRC_EXT='c'
+case $DEV_LANG in
+	c)
+		;;
+	c++)
+		SRC_EXT='cc'
+		;;
+	*)
+		echo 'Only c and c++ are supported'
+		exit 1
+		;;
+esac
+
 if [ $# -ne 2 ]; then
-	echo "Usage: $0 project-name project-description"
+	show_help
 	exit 1
 fi
 PROJECT_NAME=$1
@@ -366,7 +406,7 @@ EOF
 
 mkdir src
 cd src
-cat > main.c <<EOF
+cat > main.$SRC_EXT <<EOF
 /**
  * $PROJECT_NAME - $PROJECT_DESCRIPTION
  * Copyright (C) $(date +%Y) Changli Gao <xiaosuo@gmail.com>
@@ -387,18 +427,16 @@ cat > main.c <<EOF
  */
 
 #include <config.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
-	return EXIT_SUCCESS;
+	return 0;
 }
 EOF
 cat > Makefile.am <<EOF
 AM_CFLAGS = -Wall -Werror
 bin_PROGRAMS = $PROJECT_NAME
-${PROJECT_NAME/-/_}_SOURCES = main.c
+${PROJECT_NAME/-/_}_SOURCES = main.${SRC_EXT}
 EOF
 
 cd ..
@@ -425,6 +463,12 @@ awk '
 	print;
 	print "AC_PROG_CC_C99";
 	print "AC_PROG_CC_C_O";
+	next;
+}
+
+/^AC_PROG_CXX/ {
+	print;
+	print "AX_CXX_COMPILE_STDCXX_14";
 	next;
 }
 
@@ -475,8 +519,8 @@ src/$PROJECT_NAME
 stamp-h1
 EOF
 git init
-git add .gitignore configure.ac Makefile.am README.md LICENSE.txt src/main.c \
-	    src/Makefile.am
+git add .gitignore configure.ac Makefile.am README.md LICENSE.txt \
+	src/main.$SRC_EXT src/Makefile.am
 
 autoreconf -fi
 ./configure --prefix=/usr --sysconfdir=/etc
