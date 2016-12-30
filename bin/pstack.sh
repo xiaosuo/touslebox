@@ -6,5 +6,4 @@ if [ $# -ne 1 ]; then
 fi
 pid=$1
 
-gdb /proc/$pid/exe $pid -ex 'thread apply all bt full' -ex 'set confirm off' \
-	-ex 'quit'
+gdb /proc/$pid/exe $pid -ex 'thread apply all bt full' -batch
