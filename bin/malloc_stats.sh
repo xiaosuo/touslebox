@@ -9,9 +9,9 @@ fi
 PID=$1
 
 if grep -q jemalloc /proc/$PID/maps; then
-	gdb attch $PID \
+	gdb attach $PID \
 		-ex 'call malloc_stats_print((void*)0, (void*)0, (void*)0)' \
 		-batch
 else
-	gdb attch $1 -ex 'call malloc_stats()' -batch
+	gdb attach $1 -ex 'call malloc_stats()' -batch
 fi
