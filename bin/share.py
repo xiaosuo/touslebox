@@ -36,10 +36,24 @@ class ContentsServer(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(contents))
 
+class WithPutHandler(SimpleHTTPRequestHandler):
+    def do_PUT(self):
+        path = self.translate_path(self.path)
+        if path.endswith('/'):
+            self.send_response(405, 'Method Not Allowed')
+            self.wfile.write("PUT not allowed on a directory\n".encode())
+            return
+        if not os.path.isdir(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        length = int(self.headers['Content-Length'])
+        with open(path, 'wb') as f:
+            f.write(self.rfile.read(length))
+        self.send_response(201, 'Created')
+
 if path == '-':
     klass = ContentsServer
 else:
-    klass = SimpleHTTPRequestHandler
+    klass = WithPutHandler
 
 httpd = HTTPServer(('', 0), klass)
 port = httpd.socket.getsockname()[1]
