@@ -6,6 +6,7 @@ import argparse
 import stat
 import atexit
 import re
+import glob
 
 class IOReq(object):
     def __init__(self, comm, pid, start_time, nsec):
@@ -36,6 +37,17 @@ def sprint_us(us):
         s += '.%03d' % us
     return s
 
+def get_root_dev(major, minor):
+    p = '/sys/dev/block/{}:{}'.format(major, minor)
+    target = os.path.basename(os.readlink(p))
+    if os.path.exists(os.path.join(p, 'partition')):
+        res = glob.glob('/sys/class/block/*/{}'.format(target))
+        if not res:
+            raise RuntimeError("Can't find the root device of {}".format(target))
+        target = os.path.basename(os.path.dirname(res[0]))
+    st = os.stat('/dev/{}'.format(target))
+    return os.major(st.st_rdev), os.minor(st.st_rdev)
+
 def main():
     ap = argparse.ArgumentParser(description='Snoop the io operations')
     ap.add_argument('-d', '--device', required=True, help='The device or directory')
@@ -49,16 +61,7 @@ def main():
     else:
         major, minor = os.major(st.st_dev), os.minor(st.st_dev)
 
-    # Get the root device.
-    basename = os.path.basename(os.readlink('/sys/dev/block/{}:{}'.format(major, minor)))
-    while len(basename) > 0:
-        end = basename[-1]
-        if end >= '0' and end <= '9':
-            basename = basename[:-1]
-        else:
-            break
-    st = os.stat('/dev/{}'.format(basename))
-    major, minor = os.major(st.st_rdev), os.minor(st.st_rdev)
+    major, minor = get_root_dev(major, minor)
 
     if os.geteuid() != 0:
         print >>sys.stderr, "You must be root to run this script"
